@@ -1,0 +1,26 @@
+# --- Jupyter ---
+*.ipynb_checkpoints
+*Untitled*.ipynb
+
+# --- Python ---
+.venv
+venv
+MANIFEST
+build
+dist
+.eggs
+*.egg-info
+__pycache__/
+*.py[cod]
+.tox
+
+# --- PyEnv ---
+.python-version
+
+# -- Python Tests ---
+*.coverage
+*.pytest_cache
+
+# --- IDE ---
+.idea
+.vscode
