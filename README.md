@@ -20,8 +20,3 @@ Run the tests
 ```bash
 tox
 ```
-
-# Contributors
-
-- [@rmorshea](https://github.com/rmorshea)
-- [@ChristopherPaige](https://github.com/ChristopherPaige)
