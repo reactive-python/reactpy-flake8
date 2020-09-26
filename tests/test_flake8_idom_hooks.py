@@ -1,27 +1,24 @@
 import ast
 from pathlib import Path
 
-import pytest
-
 from flake8_idom_hooks import Plugin
 
 
-case_file_asts = {}
-for path in (Path(__file__).parent / "cases").rglob("*.py"):
-    with path.open() as f:
-        tree = ast.parse(f.read(), path.name)
-        case_file_asts[path.name[:-3]] = tree
+def test_flake8_idom_hooks():
+    path_to_case_file = Path(__file__).parent / "hook_usage_cases.py"
+    with path_to_case_file.open() as file:
+        # save the file's AST
+        file_content = file.read()
+        tree = ast.parse(file_content, path_to_case_file.name)
 
-
-expectations = {
-    "hook_in_conditional": [(7, 39, "hooks cannot be used in conditionals")]
-}
-
-
-@pytest.mark.parametrize(
-    "tree, expected_errors",
-    [(case_file_asts[name], expectations[name]) for name in case_file_asts],
-)
-def test_flake8_idom_hooks(tree, expected_errors):
+        # find 'error' comments to construct expectations
+        expected_errors = []
+        for index, line in enumerate(file_content.split("\n")):
+            lstrip_line = line.lstrip()
+            if lstrip_line.startswith("# error:"):
+                lineno = index + 2  # use 2 since error should be on next line
+                col_offset = len(line) - len(lstrip_line)
+                message = line.replace("# error:", "", 1).strip()
+                expected_errors.append((lineno, col_offset, message))
     actual_errors = Plugin(tree).run()
     assert [(ln, col, msg) for ln, col, msg, p_type in actual_errors] == expected_errors
