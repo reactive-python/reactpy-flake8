@@ -4,7 +4,7 @@ from pkg_resources import (
     get_distribution as _get_distribution,
     DistributionNotFound as _DistributionNotFound,
 )
-from typing import List, Tuple, Iterator, Union, Optional
+from typing import List, Tuple, Iterator, Union, Optional, Type
 
 
 try:
@@ -23,7 +23,7 @@ class Plugin:
     def __init__(self, tree: ast.Module):
         self._tree = tree
 
-    def run(self):
+    def run(self) -> List[Tuple[int, int, str, Type["Plugin"]]]:
         visitor = HookRulesVisitor()
         visitor.visit(self._tree)
         cls = type(self)
@@ -66,8 +66,8 @@ class HookRulesVisitor(ast.NodeVisitor):
 
     def _check_if_hook_defined_in_function(self, node: ast.FunctionDef) -> None:
         if self._current_function is not None and _is_hook_or_element_def(node):
-            msg = f"Hook {node.name!r} defined inside another function."
-            self.errors.append((node.lineno, node.col_offset, msg))
+            msg = f"hook {node.name!r} defined as closure in function {self._current_function.name!r}"
+            self._save_error(100, node, msg)
 
     def _check_if_propper_hook_usage(self, node: Union[ast.Name, ast.Attribute]):
         if isinstance(node, ast.Name):
@@ -79,8 +79,8 @@ class HookRulesVisitor(ast.NodeVisitor):
             return
 
         if not _is_hook_or_element_def(self._current_function):
-            msg = f"Hook {name!r} used outside element or hook definition."
-            self.errors.append((node.lineno, node.col_offset, msg))
+            msg = f"hook {name!r} used outside element or hook definition"
+            self._save_error(101, node, msg)
             return
 
         _loop_or_conditional = self._current_conditional or self._current_loop
@@ -94,9 +94,12 @@ class HookRulesVisitor(ast.NodeVisitor):
                 ast.While: "while loop",
             }
             node_name = node_type_to_name[node_type]
-            msg = f"Hook {name!r} used inside {node_name}."
-            self.errors.append((node.lineno, node.col_offset, msg))
+            msg = f"hook {name!r} used inside {node_name}"
+            self._save_error(102, node, msg)
             return
+
+    def _save_error(self, error_code: int, node: ast.AST, message: str):
+        self.errors.append((node.lineno, node.col_offset, f"ROH{error_code} {message}"))
 
     @contextmanager
     def _set_current(self, **attrs) -> Iterator[None]:
