@@ -64,9 +64,9 @@ class RulesOfHooksVisitor(ErrorVisitor):
             msg = f"hook {name!r} used outside element or hook definition"
             self._save_error(101, node, msg)
 
-        _loop_or_conditional = self._current_conditional or self._current_loop
-        if _loop_or_conditional is not None:
-            node_type = type(_loop_or_conditional)
+        loop_or_conditional = self._current_conditional or self._current_loop
+        if loop_or_conditional is not None:
+            node_type = type(loop_or_conditional)
             node_type_to_name = {
                 ast.If: "if statement",
                 ast.IfExp: "inline if expression",
