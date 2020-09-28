@@ -197,6 +197,6 @@ def CheckEffects():
 
     use_effect(
         lambda: None,
-        # error: ROH202 dependency args of 'use_effect' should be a literal list or tuple - not expression type 'ListComp'
-        [i for i in range(3)],
+        # error: ROH202 dependency args of 'use_effect' should be a literal list or tuple - not expression type 'Name'
+        not_a_list_or_tuple,
     )
