@@ -200,3 +200,9 @@ def CheckEffects():
         # error: ROH202 dependency args of 'use_effect' should be a literal list or tuple - not expression type 'Name'
         not_a_list_or_tuple,
     )
+
+
+def make_element():
+    # nested element definitions are ok.
+    def NestedElement():
+        use_state
