@@ -1,5 +1,18 @@
 import ast
-from typing import List, Tuple
+from contextlib import contextmanager
+from typing import List, Tuple, Iterator, Any
+
+
+@contextmanager
+def set_current(obj: Any, **attrs: Any) -> Iterator[None]:
+    old_attrs = {k: getattr(obj, f"_current_{k}") for k in attrs}
+    for k, v in attrs.items():
+        setattr(obj, f"_current_{k}", v)
+    try:
+        yield
+    finally:
+        for k, v in old_attrs.items():
+            setattr(obj, f"_current_{k}", v)
 
 
 class ErrorVisitor(ast.NodeVisitor):

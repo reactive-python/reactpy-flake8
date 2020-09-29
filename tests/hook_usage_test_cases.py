@@ -111,6 +111,9 @@ def not_hook_or_element():
 
 
 def CheckEffects():
+    x = 1
+    y = 2
+
     use_effect(
         lambda: (
             # error: ROH203 dependency 'x' of function 'lambda' is not specified in declaration of 'use_effect'
@@ -205,4 +208,22 @@ def CheckEffects():
 def make_element():
     # nested element definitions are ok.
     def NestedElement():
+        use_state
+
+
+some_global_variable
+
+
+def Element():
+    # referencing a global variable is OK
+    use_effect(lambda: some_global_variable, [])
+
+
+if True:
+
+    def Element():
+        # this is ok since the conditional is outside the element
+        use_state
+
+    def use_other():
         use_state
