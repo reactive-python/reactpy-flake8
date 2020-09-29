@@ -10,8 +10,12 @@ class ErrorVisitor(ast.NodeVisitor):
         self.errors.append((node.lineno, node.col_offset, f"ROH{error_code} {message}"))
 
 
-def is_hook_or_element_def(node: ast.FunctionDef) -> bool:
-    return is_element_function_name(node.name) or is_hook_function_name(node.name)
+def is_hook_def(node: ast.FunctionDef) -> bool:
+    return is_hook_function_name(node.name)
+
+
+def is_element_def(node: ast.FunctionDef) -> bool:
+    return is_element_function_name(node.name)
 
 
 def is_element_function_name(name: str) -> bool:

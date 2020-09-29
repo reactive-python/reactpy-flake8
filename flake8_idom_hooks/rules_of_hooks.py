@@ -2,22 +2,26 @@ import ast
 from contextlib import contextmanager
 from typing import Iterator, Union, Optional, Any
 
-from .utils import is_hook_or_element_def, ErrorVisitor, is_hook_function_name
+from .utils import is_hook_def, is_element_def, ErrorVisitor, is_hook_function_name
 
 
 class RulesOfHooksVisitor(ErrorVisitor):
     def __init__(self) -> None:
         super().__init__()
-        self._current_hook_or_element: Optional[ast.FunctionDef] = None
+        self._current_hook: Optional[ast.FunctionDef] = None
+        self._current_element: Optional[ast.FunctionDef] = None
         self._current_function: Optional[ast.FunctionDef] = None
         self._current_call: Optional[ast.Call] = None
         self._current_conditional: Union[None, ast.If, ast.IfExp, ast.Try] = None
         self._current_loop: Union[None, ast.For, ast.While] = None
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        if is_hook_or_element_def(node):
+        if is_hook_def(node):
             self._check_if_hook_defined_in_function(node)
-            with self._set_current(hook_or_element=node, function=node):
+            with self._set_current(hook=node, function=node):
+                self.generic_visit(node)
+        elif is_element_def(node):
+            with self._set_current(element=node, function=node):
                 self.generic_visit(node)
         else:
             with self._set_current(function=node):
@@ -60,7 +64,7 @@ class RulesOfHooksVisitor(ErrorVisitor):
         if not is_hook_function_name(name):
             return None
 
-        if self._current_hook_or_element is None:
+        if self._current_hook is None and self._current_element is None:
             msg = f"hook {name!r} used outside element or hook definition"
             self._save_error(101, node, msg)
 

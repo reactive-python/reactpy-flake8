@@ -1,7 +1,7 @@
 import ast
 from typing import Optional, List, Union, Set
 
-from .utils import is_hook_or_element_def, ErrorVisitor
+from .utils import is_hook_def, is_element_def, ErrorVisitor
 
 
 HOOKS_WITH_DEPS = ("use_effect", "use_callback", "use_memo")
@@ -13,7 +13,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
         self._current_hook_or_element: Optional[ast.FunctionDef] = None
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        if is_hook_or_element_def(node):
+        if is_hook_def(node) or is_element_def(node):
             self._current_hook_or_element = node
             self.generic_visit(node)
             self._current_hook_or_element = None
