@@ -1,8 +1,13 @@
 import ast
-from contextlib import contextmanager
-from typing import Iterator, Union, Optional, Any
+from typing import Union, Optional
 
-from .utils import is_hook_def, is_element_def, ErrorVisitor, is_hook_function_name
+from .utils import (
+    is_hook_def,
+    is_element_def,
+    ErrorVisitor,
+    is_hook_function_name,
+    set_current,
+)
 
 
 class RulesOfHooksVisitor(ErrorVisitor):
@@ -18,13 +23,27 @@ class RulesOfHooksVisitor(ErrorVisitor):
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         if is_hook_def(node):
             self._check_if_hook_defined_in_function(node)
-            with self._set_current(hook=node, function=node):
+            with set_current(
+                self,
+                hook=node,
+                function=node,
+                # we need to reset these before enter new hook
+                conditional=None,
+                loop=None,
+            ):
                 self.generic_visit(node)
         elif is_element_def(node):
-            with self._set_current(element=node, function=node):
+            with set_current(
+                self,
+                element=node,
+                function=node,
+                # we need to reset these before enter new element
+                conditional=None,
+                loop=None,
+            ):
                 self.generic_visit(node)
         else:
-            with self._set_current(function=node):
+            with set_current(self, function=node):
                 self.generic_visit(node)
 
     def _visit_hook_usage(self, node: Union[ast.Name, ast.Attribute]) -> None:
@@ -34,7 +53,7 @@ class RulesOfHooksVisitor(ErrorVisitor):
     visit_Name = _visit_hook_usage
 
     def _visit_conditional(self, node: ast.AST) -> None:
-        with self._set_current(conditional=node):
+        with set_current(self, conditional=node):
             self.generic_visit(node)
 
     visit_If = _visit_conditional
@@ -42,7 +61,7 @@ class RulesOfHooksVisitor(ErrorVisitor):
     visit_Try = _visit_conditional
 
     def _visit_loop(self, node: ast.AST) -> None:
-        with self._set_current(loop=node):
+        with set_current(self, loop=node):
             self.generic_visit(node)
 
     visit_For = _visit_loop
@@ -81,14 +100,3 @@ class RulesOfHooksVisitor(ErrorVisitor):
             node_name = node_type_to_name[node_type]
             msg = f"hook {name!r} used inside {node_name}"
             self._save_error(102, node, msg)
-
-    @contextmanager
-    def _set_current(self, **attrs: Any) -> Iterator[None]:
-        old_attrs = {k: getattr(self, f"_current_{k}") for k in attrs}
-        for k, v in attrs.items():
-            setattr(self, f"_current_{k}", v)
-        try:
-            yield
-        finally:
-            for k, v in old_attrs.items():
-                setattr(self, f"_current_{k}", v)

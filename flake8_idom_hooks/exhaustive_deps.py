@@ -1,7 +1,7 @@
 import ast
-from typing import Optional, List, Union, Set
+from typing import Optional, Union, Set
 
-from .utils import is_hook_def, is_element_def, ErrorVisitor
+from .utils import is_hook_def, is_element_def, ErrorVisitor, set_current
 
 
 HOOKS_WITH_DEPS = ("use_effect", "use_callback", "use_memo")
@@ -10,13 +10,13 @@ HOOKS_WITH_DEPS = ("use_effect", "use_callback", "use_memo")
 class ExhaustiveDepsVisitor(ErrorVisitor):
     def __init__(self) -> None:
         super().__init__()
+        self._current_function: Optional[ast.FunctionDef] = None
         self._current_hook_or_element: Optional[ast.FunctionDef] = None
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         if is_hook_def(node) or is_element_def(node):
-            self._current_hook_or_element = node
-            self.generic_visit(node)
-            self._current_hook_or_element = None
+            with set_current(self, hook_or_element=node):
+                self.generic_visit(node)
         elif self._current_hook_or_element is not None:
             for deco in node.decorator_list:
                 if not isinstance(deco, ast.Call):
@@ -94,30 +94,35 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
 
         func_name = "lambda" if isinstance(func, ast.Lambda) else func.name
 
-        visitor = _MissingNameOrAttrVisitor(
-            hook_name,
-            func_name,
-            _param_names_of_function_def(func),
-            dep_names,
+        top_level_variable_finder = _TopLevelVariableFinder()
+        top_level_variable_finder.visit(self._current_hook_or_element)
+        variables_defined_in_scope = top_level_variable_finder.variable_names
+
+        missing_name_finder = _MissingNameFinder(
+            hook_name=hook_name,
+            func_name=func_name,
+            dep_names=dep_names,
+            names_in_scope=variables_defined_in_scope,
+            ignore_names=_param_names_of_function_def(func),
         )
         if isinstance(func.body, list):
             for b in func.body:
-                visitor.visit(b)
+                missing_name_finder.visit(b)
         else:
-            visitor.visit(func.body)
+            missing_name_finder.visit(func.body)
 
-        self.errors.extend(visitor.errors)
+        self.errors.extend(missing_name_finder.errors)
 
     def _get_dependency_names_from_expression(
         self, hook_name: str, dependency_expr: Optional[ast.expr]
-    ) -> Optional[List[str]]:
+    ) -> Optional[Set[str]]:
         if dependency_expr is None:
-            return []
+            return set()
         elif isinstance(dependency_expr, (ast.List, ast.Tuple)):
-            dep_names: List[str] = []
+            dep_names: Set[str] = set()
             for elt in dependency_expr.elts:
                 if isinstance(elt, ast.Name):
-                    dep_names.append(elt.id)
+                    dep_names.add(elt.id)
                 else:
                     # ideally we could deal with some common use cases, but since React's
                     # own linter doesn't do this we'll just take the easy route for now:
@@ -144,24 +149,26 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
             return None
 
 
-class _MissingNameOrAttrVisitor(ErrorVisitor):
+class _MissingNameFinder(ErrorVisitor):
     def __init__(
         self,
         hook_name: str,
         func_name: str,
-        ignore_names: List[str],
-        dep_names: List[str],
+        dep_names: Set[str],
+        ignore_names: Set[str],
+        names_in_scope: Set[str],
     ) -> None:
         super().__init__()
         self._hook_name = hook_name
         self._func_name = func_name
         self._ignore_names = ignore_names
         self._dep_names = dep_names
+        self._names_in_scope = names_in_scope
         self.used_deps: Set[str] = set()
 
     def visit_Name(self, node: ast.Name) -> None:
         node_id = node.id
-        if node_id not in self._ignore_names:
+        if node_id not in self._ignore_names and node_id in self._names_in_scope:
             if node_id in self._dep_names:
                 self.used_deps.add(node_id)
             else:
@@ -175,12 +182,33 @@ class _MissingNameOrAttrVisitor(ErrorVisitor):
                 )
 
 
-def _param_names_of_function_def(func: Union[ast.FunctionDef, ast.Lambda]) -> List[str]:
-    names: List[str] = []
-    names.extend(a.arg for a in func.args.args)
-    names.extend(kw.arg for kw in func.args.kwonlyargs)
+class _TopLevelVariableFinder(ast.NodeVisitor):
+    def __init__(self) -> None:
+        self._scope_entered = False
+        self._current_scope_is_top_level = True
+        self.variable_names: Set[str] = set()
+
+    def visit_Name(self, node: ast.Name) -> None:
+        if isinstance(node.ctx, ast.Store):
+            self.variable_names.add(node.id)
+
+    def _visit_new_scope(self, node: Union[ast.FunctionDef, ast.ClassDef]) -> None:
+        if not self._scope_entered:
+            self._scope_entered = True
+            self.generic_visit(node)
+        elif self._current_scope_is_top_level:
+            self.variable_names.add(node.name)
+
+    visit_FunctionDef = _visit_new_scope
+    visit_ClassDef = _visit_new_scope
+
+
+def _param_names_of_function_def(func: Union[ast.FunctionDef, ast.Lambda]) -> Set[str]:
+    names: Set[str] = set()
+    names.update(a.arg for a in func.args.args)
+    names.update(kw.arg for kw in func.args.kwonlyargs)
     if func.args.vararg is not None:
-        names.append(func.args.vararg.arg)
+        names.add(func.args.vararg.arg)
     if func.args.kwarg is not None:
-        names.append(func.args.kwarg.arg)
+        names.add(func.args.kwarg.arg)
     return names
