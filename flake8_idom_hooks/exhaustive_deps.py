@@ -36,6 +36,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
                 for kw in deco.keywords:
                     if kw.arg == "args":
                         self._check_hook_dependency_list_is_exhaustive(
+                            self._current_hook_or_element,
                             called_func_name,
                             node,
                             kw.value,
@@ -74,6 +75,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
 
         if isinstance(func, ast.Lambda):
             self._check_hook_dependency_list_is_exhaustive(
+                self._current_hook_or_element,
                 called_func_name,
                 func,
                 args,
@@ -81,6 +83,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
 
     def _check_hook_dependency_list_is_exhaustive(
         self,
+        current_hook_or_element: ast.FunctionDef,
         hook_name: str,
         func: Union[ast.FunctionDef, ast.Lambda],
         dependency_expr: Optional[ast.expr],
@@ -95,7 +98,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
         func_name = "lambda" if isinstance(func, ast.Lambda) else func.name
 
         top_level_variable_finder = _TopLevelVariableFinder()
-        top_level_variable_finder.visit(self._current_hook_or_element)
+        top_level_variable_finder.visit(current_hook_or_element)
         variables_defined_in_scope = top_level_variable_finder.variable_names
 
         missing_name_finder = _MissingNameFinder(
