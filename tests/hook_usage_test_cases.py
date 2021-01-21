@@ -82,7 +82,7 @@ def outer_function():
 
 
 def generic_function():
-    # error: ROH101 hook 'use_state' used outside element or hook definition
+    # error: ROH101 hook 'use_state' used outside component or hook definition
     use_state
 
 
@@ -90,7 +90,7 @@ def use_state():
     use_other
 
 
-def Element():
+def Component():
     use_state
 
 
@@ -101,12 +101,12 @@ def use_custom_hook():
 # ok since 'use_state' is not the last attribute
 module.use_state.other
 
-# error: ROH101 hook 'use_effect' used outside element or hook definition
+# error: ROH101 hook 'use_effect' used outside component or hook definition
 module.use_effect()
 
 
-def not_hook_or_element():
-    # error: ROH101 hook 'use_state' used outside element or hook definition
+def not_hook_or_component():
+    # error: ROH101 hook 'use_state' used outside component or hook definition
     use_state
 
 
@@ -205,24 +205,24 @@ def CheckEffects():
     )
 
 
-def make_element():
-    # nested element definitions are ok.
-    def NestedElement():
+def make_component():
+    # nested component definitions are ok.
+    def NestedComponent():
         use_state
 
 
 some_global_variable
 
 
-def Element():
+def Component():
     # referencing a global variable is OK
     use_effect(lambda: some_global_variable, [])
 
 
 if True:
 
-    def Element():
-        # this is ok since the conditional is outside the element
+    def Component():
+        # this is ok since the conditional is outside the component
         use_state
 
     def use_other():

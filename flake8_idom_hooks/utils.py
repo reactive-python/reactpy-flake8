@@ -27,11 +27,11 @@ def is_hook_def(node: ast.FunctionDef) -> bool:
     return is_hook_function_name(node.name)
 
 
-def is_element_def(node: ast.FunctionDef) -> bool:
-    return is_element_function_name(node.name)
+def is_component_def(node: ast.FunctionDef) -> bool:
+    return is_component_function_name(node.name)
 
 
-def is_element_function_name(name: str) -> bool:
+def is_component_function_name(name: str) -> bool:
     return name[0].upper() == name[0] and "_" not in name
 
 
