@@ -3,7 +3,7 @@ from typing import Union, Optional
 
 from .utils import (
     is_hook_def,
-    is_element_def,
+    is_component_def,
     ErrorVisitor,
     is_hook_function_name,
     set_current,
@@ -14,7 +14,7 @@ class RulesOfHooksVisitor(ErrorVisitor):
     def __init__(self) -> None:
         super().__init__()
         self._current_hook: Optional[ast.FunctionDef] = None
-        self._current_element: Optional[ast.FunctionDef] = None
+        self._current_component: Optional[ast.FunctionDef] = None
         self._current_function: Optional[ast.FunctionDef] = None
         self._current_call: Optional[ast.Call] = None
         self._current_conditional: Union[None, ast.If, ast.IfExp, ast.Try] = None
@@ -32,12 +32,12 @@ class RulesOfHooksVisitor(ErrorVisitor):
                 loop=None,
             ):
                 self.generic_visit(node)
-        elif is_element_def(node):
+        elif is_component_def(node):
             with set_current(
                 self,
-                element=node,
+                component=node,
                 function=node,
-                # we need to reset these before enter new element
+                # we need to reset these before visiting a new component
                 conditional=None,
                 loop=None,
             ):
@@ -83,8 +83,8 @@ class RulesOfHooksVisitor(ErrorVisitor):
         if not is_hook_function_name(name):
             return None
 
-        if self._current_hook is None and self._current_element is None:
-            msg = f"hook {name!r} used outside element or hook definition"
+        if self._current_hook is None and self._current_component is None:
+            msg = f"hook {name!r} used outside component or hook definition"
             self._save_error(101, node, msg)
 
         loop_or_conditional = self._current_conditional or self._current_loop

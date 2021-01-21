@@ -1,7 +1,7 @@
 import ast
 from typing import Optional, Union, Set
 
-from .utils import is_hook_def, is_element_def, ErrorVisitor, set_current
+from .utils import is_hook_def, is_component_def, ErrorVisitor, set_current
 
 
 HOOKS_WITH_DEPS = ("use_effect", "use_callback", "use_memo")
@@ -11,13 +11,13 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
     def __init__(self) -> None:
         super().__init__()
         self._current_function: Optional[ast.FunctionDef] = None
-        self._current_hook_or_element: Optional[ast.FunctionDef] = None
+        self._current_hook_or_component: Optional[ast.FunctionDef] = None
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        if is_hook_def(node) or is_element_def(node):
-            with set_current(self, hook_or_element=node):
+        if is_hook_def(node) or is_component_def(node):
+            with set_current(self, hook_or_component=node):
                 self.generic_visit(node)
-        elif self._current_hook_or_element is not None:
+        elif self._current_hook_or_component is not None:
             for deco in node.decorator_list:
                 if not isinstance(deco, ast.Call):
                     continue
@@ -36,7 +36,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
                 for kw in deco.keywords:
                     if kw.arg == "args":
                         self._check_hook_dependency_list_is_exhaustive(
-                            self._current_hook_or_element,
+                            self._current_hook_or_component,
                             called_func_name,
                             node,
                             kw.value,
@@ -44,7 +44,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
                         break
 
     def visit_Call(self, node: ast.Call) -> None:
-        if self._current_hook_or_element is None:
+        if self._current_hook_or_component is None:
             return
 
         called_func = node.func
@@ -75,7 +75,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
 
         if isinstance(func, ast.Lambda):
             self._check_hook_dependency_list_is_exhaustive(
-                self._current_hook_or_element,
+                self._current_hook_or_component,
                 called_func_name,
                 func,
                 args,
@@ -83,7 +83,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
 
     def _check_hook_dependency_list_is_exhaustive(
         self,
-        current_hook_or_element: ast.FunctionDef,
+        current_hook_or_component: ast.FunctionDef,
         hook_name: str,
         func: Union[ast.FunctionDef, ast.Lambda],
         dependency_expr: Optional[ast.expr],
@@ -98,7 +98,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
         func_name = "lambda" if isinstance(func, ast.Lambda) else func.name
 
         top_level_variable_finder = _TopLevelVariableFinder()
-        top_level_variable_finder.visit(current_hook_or_element)
+        top_level_variable_finder.visit(current_hook_or_component)
         variables_defined_in_scope = top_level_variable_finder.variable_names
 
         missing_name_finder = _MissingNameFinder(
