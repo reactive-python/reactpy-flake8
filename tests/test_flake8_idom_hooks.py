@@ -1,10 +1,10 @@
 import ast
 from pathlib import Path
 
-from flake8_idom_hooks import Plugin
+from flake8_idom import Plugin
 
 
-def test_flake8_idom_hooks():
+def test_flake8_idom():
     path_to_case_file = Path(__file__).parent / "hook_usage_test_cases.py"
     with path_to_case_file.open() as file:
         # save the file's AST

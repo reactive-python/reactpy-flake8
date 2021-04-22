@@ -20,7 +20,9 @@ class ErrorVisitor(ast.NodeVisitor):
         self.errors: List[Tuple[int, int, str]] = []
 
     def _save_error(self, error_code: int, node: ast.AST, message: str) -> None:
-        self.errors.append((node.lineno, node.col_offset, f"ROH{error_code} {message}"))
+        self.errors.append(
+            (node.lineno, node.col_offset, f"IDOM{error_code} {message}")
+        )
 
 
 def is_hook_def(node: ast.FunctionDef) -> bool:

@@ -2,7 +2,7 @@ import ast
 
 from typing import List, Tuple, Type
 
-from flake8_idom_hooks import __version__
+from flake8_idom import __version__
 
 from .utils import ErrorVisitor
 from .rules_of_hooks import RulesOfHooksVisitor
