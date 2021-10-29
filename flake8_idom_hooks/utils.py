@@ -28,12 +28,15 @@ def is_hook_def(node: ast.FunctionDef) -> bool:
 
 
 def is_component_def(node: ast.FunctionDef) -> bool:
-    return is_component_function_name(node.name)
-
-
-def is_component_function_name(name: str) -> bool:
-    return name[0].upper() == name[0] and "_" not in name
+    return any(decorator.value.id == "idom" for decorator in node.decorator_list)
 
 
 def is_hook_function_name(name: str) -> bool:
-    return name.lstrip("_").startswith("use_")
+    return name.lstrip("_") in {
+        "use_state",
+        "use_effect",
+        "use_memo",
+        "use_reducer",
+        "use_callback",
+        "use_ref",
+    }
