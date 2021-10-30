@@ -200,8 +200,13 @@ def CheckEffects():
 
     use_effect(
         lambda: None,
-        # error: ROH202 dependency args of 'use_effect' should be a literal list or tuple - not expression type 'Name'
+        # error: ROH202 dependency args of 'use_effect' should be a literal list, tuple, or None - not expression type 'Name'
         not_a_list_or_tuple,
+    )
+
+    use_effect(
+        lambda: None,
+        args=None,  # Ok, to explicitely set None
     )
 
 
