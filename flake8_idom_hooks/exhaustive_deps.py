@@ -140,13 +140,15 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
                         ),
                     )
             return dep_names
-        else:
+        elif not (
+            isinstance(dependency_expr, ast.Constant) and dependency_expr.value is None
+        ):
             self._save_error(
                 202,
                 dependency_expr,
                 (
-                    f"dependency args of {hook_name!r} should be a literal list or "
-                    f"tuple - not expression type {type(dependency_expr).__name__!r}"
+                    f"dependency args of {hook_name!r} should be a literal list, tuple, "
+                    f"or None - not expression type {type(dependency_expr).__name__!r}"
                 ),
             )
             return None
