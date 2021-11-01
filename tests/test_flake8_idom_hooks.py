@@ -1,7 +1,7 @@
 import ast
 from pathlib import Path
 
-from flake8_idom_hooks import Plugin
+from flake8_idom_hooks import run_checks
 
 
 def test_flake8_idom_hooks():
@@ -20,5 +20,4 @@ def test_flake8_idom_hooks():
                 col_offset = len(line) - len(lstrip_line)
                 message = line.replace("# error:", "", 1).strip()
                 expected_errors.add((lineno, col_offset, message))
-    actual_errors = Plugin(tree).run()
-    assert {(ln, col, msg) for ln, col, msg, p_type in actual_errors} == expected_errors
+    assert set(run_checks(tree, exhaustive_hook_deps=True)) == expected_errors
