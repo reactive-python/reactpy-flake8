@@ -131,7 +131,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
                     # own linter doesn't do this we'll just take the easy route for now:
                     # https://github.com/facebook/react/issues/16265
                     self._save_error(
-                        201,
+                        200,
                         elt,
                         (
                             f"dependency arg of {hook_name!r} is not destructured - "
@@ -144,7 +144,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
             isinstance(dependency_expr, ast.Constant) and dependency_expr.value is None
         ):
             self._save_error(
-                202,
+                201,
                 dependency_expr,
                 (
                     f"dependency args of {hook_name!r} should be a literal list, tuple, "
@@ -152,6 +152,8 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
                 ),
             )
             return None
+        else:
+            return set()
 
 
 class _MissingNameFinder(ErrorVisitor):
@@ -178,7 +180,7 @@ class _MissingNameFinder(ErrorVisitor):
                 self.used_deps.add(node_id)
             else:
                 self._save_error(
-                    203,
+                    202,
                     node,
                     (
                         f"dependency {node_id!r} of function {self._func_name!r} "
