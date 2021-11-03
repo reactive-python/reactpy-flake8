@@ -35,11 +35,4 @@ def is_component_def(node: ast.FunctionDef) -> bool:
 
 
 def is_hook_function_name(name: str) -> bool:
-    return name.lstrip("_") in {
-        "use_state",
-        "use_effect",
-        "use_memo",
-        "use_reducer",
-        "use_callback",
-        "use_ref",
-    }
+    return name.lstrip("_").startswith("use_")
