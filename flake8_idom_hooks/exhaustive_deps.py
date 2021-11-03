@@ -141,7 +141,8 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
                     )
             return dep_names
         elif not (
-            isinstance(dependency_expr, ast.Constant) and dependency_expr.value is None
+            isinstance(dependency_expr, (ast.Constant, ast.NameConstant))
+            and dependency_expr.value is None
         ):
             self._save_error(
                 201,
