@@ -14,7 +14,7 @@ class Plugin:
     name = __name__
     version = __version__
 
-    options: Namespace = Namespace()
+    exhaustive_hook_deps: bool
 
     @classmethod
     def add_options(cls, option_manager: OptionManager) -> None:
@@ -28,7 +28,7 @@ class Plugin:
 
     @classmethod
     def parse_options(cls, options: Namespace) -> None:
-        cls.options = options
+        cls.exhaustive_hook_deps = getattr(options, "exhaustive_hook_deps", False)
 
     def __init__(self, tree: ast.Module) -> None:
         self._tree = tree
@@ -36,7 +36,5 @@ class Plugin:
     def run(self) -> list[tuple[int, int, str, type[Plugin]]]:
         return [
             error + (self.__class__,)
-            for error in run_checks(
-                self._tree, getattr(self.options, "exhaustive_hook_deps", False)
-            )
+            for error in run_checks(self._tree, self.exhaustive_hook_deps)
         ]

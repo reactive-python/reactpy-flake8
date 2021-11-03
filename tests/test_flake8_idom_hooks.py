@@ -1,7 +1,13 @@
 import ast
 from pathlib import Path
 
-from flake8_idom_hooks import run_checks
+from flake8.options.manager import OptionManager
+
+from flake8_idom_hooks import Plugin
+
+
+options_manager = OptionManager("test", "0.0.0")
+Plugin.add_options(options_manager)
 
 
 def test_flake8_idom_hooks():
@@ -19,5 +25,9 @@ def test_flake8_idom_hooks():
                 lineno = index + 2  # use 2 since error should be on next line
                 col_offset = len(line) - len(lstrip_line)
                 message = line.replace("# error:", "", 1).strip()
-                expected_errors.add((lineno, col_offset, message))
-    assert set(run_checks(tree, exhaustive_hook_deps=True)) == expected_errors
+                expected_errors.add((lineno, col_offset, message, Plugin))
+
+    options, filenames = options_manager.parse_args(["--exhaustive-hook-deps"])
+    Plugin.parse_options(options)
+
+    assert set(Plugin(tree).run()) == expected_errors
