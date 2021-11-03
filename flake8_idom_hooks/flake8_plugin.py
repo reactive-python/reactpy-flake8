@@ -14,6 +14,8 @@ class Plugin:
     name = __name__
     version = __version__
 
+    options: Namespace = Namespace()
+
     @classmethod
     def add_options(cls, option_manager: OptionManager) -> None:
         option_manager.add_option(
@@ -34,5 +36,7 @@ class Plugin:
     def run(self) -> list[tuple[int, int, str, type[Plugin]]]:
         return [
             error + (self.__class__,)
-            for error in run_checks(self._tree, self.options.exhaustive_hook_deps)
+            for error in run_checks(
+                self._tree, getattr(self.options, "exhaustive_hook_deps", False)
+            )
         ]
