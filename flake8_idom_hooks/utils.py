@@ -29,8 +29,14 @@ def is_hook_def(node: ast.FunctionDef) -> bool:
 
 def is_component_def(node: ast.FunctionDef) -> bool:
     return any(
-        decorator.value.id == "idom" and decorator.attr == "component"
-        for decorator in node.decorator_list
+        is_idom_component_decorator(decorator) for decorator in node.decorator_list
+    )
+
+
+def is_idom_component_decorator(node) -> bool:
+    return getattr(node, "id", None) == "component" or (
+        getattr(getattr(node, "value", None), "id", None) == "idom"
+        and getattr(node, "attr", None) == "component"
     )
 
 

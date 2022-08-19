@@ -1,3 +1,4 @@
+import idom
 from idom import component
 
 
@@ -88,16 +89,14 @@ def HookInWhileLoop():
         use_state
 
 
-@component
 def outer_function():
     # error: ROH100 hook 'use_state' defined as closure in function 'outer_function'
-    @component
     def use_state():
         ...
 
 
-@component
 def generic_function():
+
     # error: ROH101 hook 'use_state' used outside component or hook definition
     use_state
 
@@ -109,6 +108,11 @@ def use_state():
 
 @component
 def Component():
+    use_state
+
+
+@idom.component
+def IdomLongImportComponent():
     use_state
 
 
@@ -124,7 +128,6 @@ module.use_state.other
 module.use_effect()
 
 
-@component
 def not_hook_or_component():
     # error: ROH101 hook 'use_state' used outside component or hook definition
     use_state
@@ -187,41 +190,34 @@ def CheckEffects():
     )
 
     @use_effect(args=[x])
-    @component
     def my_effect():
         x
 
     @use_effect(args=[])
-    @component
     def my_effect():
         # error: ROH202 dependency 'x' of function 'my_effect' is not specified in declaration of 'use_effect'
         x
 
     @use_effect(args=[])
     @some_other_deco_that_adds_args_to_func_somehow
-    @component
     def my_effect(*args, **kwargs):
         args
         kwargs
 
     @module.use_effect(args=[])
-    @component
     def my_effect():
         # error: ROH202 dependency 'x' of function 'my_effect' is not specified in declaration of 'use_effect'
         x
 
     @not_a_decorator_we_care_about
-    @component
     def some_func():
         ...
 
     @not_a_decorator_we_care_about()
-    @component
     def some_func():
         ...
 
     @use_effect
-    @component
     def impropper_usage_of_effect_as_decorator():
         # ignored because bad useage
         x
