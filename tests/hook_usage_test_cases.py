@@ -1,9 +1,14 @@
+from idom import component
+
+
+@component
 def HookInIf():
     if True:
         # error: ROH102 hook 'use_state' used inside if statement
         use_state
 
 
+@component
 def HookInElif():
     if False:
         pass
@@ -12,6 +17,7 @@ def HookInElif():
         use_state
 
 
+@component
 def HookInElse():
     if False:
         pass
@@ -20,6 +26,7 @@ def HookInElse():
         use_state
 
 
+@component
 def HookInIfExp():
     (
         # error: ROH102 hook 'use_state' used inside inline if expression
@@ -29,6 +36,7 @@ def HookInIfExp():
     )
 
 
+@component
 def HookInElseOfIfExp():
     (
         None
@@ -39,6 +47,7 @@ def HookInElseOfIfExp():
     )
 
 
+@component
 def HookInTry():
     try:
         # error: ROH102 hook 'use_state' used inside try statement
@@ -47,6 +56,7 @@ def HookInTry():
         pass
 
 
+@component
 def HookInExcept():
     try:
         raise ValueError()
@@ -55,6 +65,7 @@ def HookInExcept():
         use_state
 
 
+@component
 def HookInFinally():
     try:
         pass
@@ -63,37 +74,45 @@ def HookInFinally():
         use_state
 
 
+@component
 def HookInForLoop():
     for i in range(3):
         # error: ROH102 hook 'use_state' used inside for loop
         use_state
 
 
+@component
 def HookInWhileLoop():
     while True:
         # error: ROH102 hook 'use_state' used inside while loop
         use_state
 
 
+@component
 def outer_function():
     # error: ROH100 hook 'use_state' defined as closure in function 'outer_function'
+    @component
     def use_state():
         ...
 
 
+@component
 def generic_function():
     # error: ROH101 hook 'use_state' used outside component or hook definition
     use_state
 
 
+@component
 def use_state():
     use_other
 
 
+@component
 def Component():
     use_state
 
 
+@component
 def use_custom_hook():
     use_state
 
@@ -105,11 +124,13 @@ module.use_state.other
 module.use_effect()
 
 
+@component
 def not_hook_or_component():
     # error: ROH101 hook 'use_state' used outside component or hook definition
     use_state
 
 
+@component
 def CheckEffects():
     x = 1
     y = 2
@@ -166,34 +187,41 @@ def CheckEffects():
     )
 
     @use_effect(args=[x])
+    @component
     def my_effect():
         x
 
     @use_effect(args=[])
+    @component
     def my_effect():
         # error: ROH202 dependency 'x' of function 'my_effect' is not specified in declaration of 'use_effect'
         x
 
     @use_effect(args=[])
     @some_other_deco_that_adds_args_to_func_somehow
+    @component
     def my_effect(*args, **kwargs):
         args
         kwargs
 
     @module.use_effect(args=[])
+    @component
     def my_effect():
         # error: ROH202 dependency 'x' of function 'my_effect' is not specified in declaration of 'use_effect'
         x
 
     @not_a_decorator_we_care_about
+    @component
     def some_func():
         ...
 
     @not_a_decorator_we_care_about()
+    @component
     def some_func():
         ...
 
     @use_effect
+    @component
     def impropper_usage_of_effect_as_decorator():
         # ignored because bad useage
         x
@@ -210,8 +238,10 @@ def CheckEffects():
     )
 
 
+@component
 def make_component():
     # nested component definitions are ok.
+    @component
     def NestedComponent():
         use_state
 
@@ -219,6 +249,7 @@ def make_component():
 some_global_variable
 
 
+@component
 def Component():
     # referencing a global variable is OK
     use_effect(lambda: some_global_variable, [])
@@ -226,9 +257,11 @@ def Component():
 
 if True:
 
+    @component
     def Component():
         # this is ok since the conditional is outside the component
         use_state
 
+    @component
     def use_other():
         use_state
