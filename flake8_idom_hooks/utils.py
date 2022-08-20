@@ -1,6 +1,6 @@
 import ast
 from contextlib import contextmanager
-from typing import List, Tuple, Iterator, Any
+from typing import Any, Iterator, List, Tuple
 
 
 @contextmanager
@@ -33,7 +33,7 @@ def is_component_def(node: ast.FunctionDef) -> bool:
     )
 
 
-def is_idom_component_decorator(node) -> bool:
+def is_idom_component_decorator(node: Any) -> bool:
     return getattr(node, "id", None) == "component" or (
         getattr(getattr(node, "value", None), "id", None) == "idom"
         and getattr(node, "attr", None) == "component"
