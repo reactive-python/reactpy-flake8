@@ -1,7 +1,5 @@
-from pkg_resources import (
-    get_distribution as _get_distribution,
-    DistributionNotFound as _DistributionNotFound,
-)
+from pkg_resources import DistributionNotFound as _DistributionNotFound
+from pkg_resources import get_distribution as _get_distribution
 
 try:
     __version__: str = _get_distribution(__name__).version

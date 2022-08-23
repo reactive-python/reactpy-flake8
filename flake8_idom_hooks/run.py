@@ -2,9 +2,9 @@ from __future__ import annotations
 
 import ast
 
-from .utils import ErrorVisitor
 from .exhaustive_deps import ExhaustiveDepsVisitor
 from .rules_of_hooks import RulesOfHooksVisitor
+from .utils import ErrorVisitor
 
 
 def run_checks(

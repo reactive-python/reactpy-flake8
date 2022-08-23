@@ -1,4 +1,5 @@
--r requirements/dev.txt
--r requirements/prod.txt
--r requirements/test.txt
--r requirements/lint.txt
+-r requirements/nox-deps.txt
+-r requirements/pkg-deps.txt
+-r requirements/style.txt
+-r requirements/test-env.txt
+-r requirements/types.txt

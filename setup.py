@@ -1,4 +1,5 @@
 import os
+
 import setuptools
 
 # the name of the project
@@ -46,7 +47,7 @@ package = {
 
 
 requirements = []
-with open(os.path.join(here, "requirements", "prod.txt"), "r") as f:
+with open(os.path.join(here, "requirements", "pkg-deps.txt"), "r") as f:
     for line in map(str.strip, f):
         if not line.startswith("#"):
             requirements.append(line)
