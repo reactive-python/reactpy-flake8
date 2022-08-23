@@ -1,6 +1,6 @@
 import ast
 from contextlib import contextmanager
-from typing import List, Tuple, Iterator, Any
+from typing import Any, Iterator, List, Tuple
 
 
 @contextmanager

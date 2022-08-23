@@ -1,10 +1,10 @@
 import ast
-from typing import Union, Optional
+from typing import Optional, Union
 
 from .utils import (
-    is_hook_def,
-    is_component_def,
     ErrorVisitor,
+    is_component_def,
+    is_hook_def,
     is_hook_function_name,
     set_current,
 )

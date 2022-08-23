@@ -1,8 +1,7 @@
 import ast
-from typing import Optional, Union, Set
+from typing import Optional, Set, Union
 
-from .utils import is_hook_def, is_component_def, ErrorVisitor, set_current
-
+from .utils import ErrorVisitor, is_component_def, is_hook_def, set_current
 
 HOOKS_WITH_DEPS = ("use_effect", "use_callback", "use_memo")
 

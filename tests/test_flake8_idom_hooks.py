@@ -5,7 +5,6 @@ from flake8.options.manager import OptionManager
 
 from flake8_idom_hooks import Plugin
 
-
 options_manager = OptionManager("test", "0.0.0")
 Plugin.add_options(options_manager)
 

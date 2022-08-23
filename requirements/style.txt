@@ -1,0 +1,4 @@
+flake8 >=3.7
+black
+isort
+flake8-tidy-imports
