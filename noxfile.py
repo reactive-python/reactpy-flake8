@@ -10,6 +10,7 @@ REQUIREMENTS_DIR = ROOT / "requirements"
 def test(session: Session) -> None:
     session.notify("test_style")
     session.notify("test_types")
+    session.notify("test_coverage")
     session.notify("test_suite")
 
 
@@ -29,7 +30,15 @@ def test_types(session: Session) -> None:
 @session
 def test_suite(session: Session) -> None:
     install_requirements(session, "test-env")
+    session.install(".")
     session.run("pytest", "tests")
+
+
+@session
+def test_coverage(session: Session) -> None:
+    install_requirements(session, "test-env")
+    session.install("-e", ".")
+    session.run("pytest", "tests", "--cov=flake8_idom_hooks", "--cov-report=term")
 
 
 def install_requirements(session: Session, name: str) -> None:
