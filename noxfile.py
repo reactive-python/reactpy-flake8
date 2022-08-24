@@ -7,6 +7,13 @@ REQUIREMENTS_DIR = ROOT / "requirements"
 
 
 @session
+def format(session: Session) -> None:
+    install_requirements(session, "style")
+    session.run("black", ".")
+    session.run("isort", ".")
+
+
+@session
 def test(session: Session) -> None:
     session.notify("test_style")
     session.notify("test_types")
@@ -17,6 +24,7 @@ def test(session: Session) -> None:
 @session
 def test_style(session: Session) -> None:
     install_requirements(session, "style")
+    session.run("black", "--check", ".")
     session.run("isort", "--check", ".")
     session.run("flake8", ".")
 
