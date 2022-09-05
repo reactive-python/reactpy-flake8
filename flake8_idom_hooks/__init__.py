@@ -10,4 +10,6 @@ except _DistributionNotFound:  # pragma: no cover
 from .flake8_plugin import Plugin
 from .run import run_checks
 
-__all__ = ["Plugin", "run_checks"]
+plugin = Plugin()
+
+__all__ = ["plugin", "run_checks"]

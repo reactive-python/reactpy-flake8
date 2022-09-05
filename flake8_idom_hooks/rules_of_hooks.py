@@ -1,18 +1,12 @@
 import ast
 from typing import Optional, Union
 
-from .utils import (
-    ErrorVisitor,
-    is_component_def,
-    is_hook_def,
-    is_hook_function_name,
-    set_current,
-)
+from .common import CheckContext, set_current
 
 
-class RulesOfHooksVisitor(ErrorVisitor):
-    def __init__(self) -> None:
-        super().__init__()
+class RulesOfHooksVisitor(ast.NodeVisitor):
+    def __init__(self, context: CheckContext) -> None:
+        self._context = context
         self._current_hook: Optional[ast.FunctionDef] = None
         self._current_component: Optional[ast.FunctionDef] = None
         self._current_function: Optional[ast.FunctionDef] = None
@@ -21,7 +15,7 @@ class RulesOfHooksVisitor(ErrorVisitor):
         self._current_loop: Union[None, ast.For, ast.While] = None
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        if is_hook_def(node):
+        if self._context.is_hook_def(node):
             self._check_if_hook_defined_in_function(node)
             with set_current(
                 self,
@@ -32,7 +26,7 @@ class RulesOfHooksVisitor(ErrorVisitor):
                 loop=None,
             ):
                 self.generic_visit(node)
-        elif is_component_def(node):
+        elif self._context.is_component_def(node):
             with set_current(
                 self,
                 component=node,
@@ -70,7 +64,7 @@ class RulesOfHooksVisitor(ErrorVisitor):
     def _check_if_hook_defined_in_function(self, node: ast.FunctionDef) -> None:
         if self._current_function is not None:
             msg = f"hook {node.name!r} defined as closure in function {self._current_function.name!r}"
-            self._save_error(100, node, msg)
+            self._context.add_error(100, node, msg)
 
     def _check_if_propper_hook_usage(
         self, node: Union[ast.Name, ast.Attribute]
@@ -80,12 +74,12 @@ class RulesOfHooksVisitor(ErrorVisitor):
         else:
             name = node.attr
 
-        if not is_hook_function_name(name):
+        if not self._context.is_hook_name(name):
             return None
 
         if self._current_hook is None and self._current_component is None:
             msg = f"hook {name!r} used outside component or hook definition"
-            self._save_error(101, node, msg)
+            self._context.add_error(101, node, msg)
 
         loop_or_conditional = self._current_conditional or self._current_loop
         if loop_or_conditional is not None:
@@ -99,4 +93,4 @@ class RulesOfHooksVisitor(ErrorVisitor):
             }
             node_name = node_type_to_name[node_type]
             msg = f"hook {name!r} used inside {node_name}"
-            self._save_error(102, node, msg)
+            self._context.add_error(102, node, msg)

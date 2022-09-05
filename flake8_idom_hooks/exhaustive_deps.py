@@ -1,19 +1,18 @@
 import ast
 from typing import Optional, Set, Union
 
-from .utils import ErrorVisitor, is_component_def, is_hook_def, set_current
+from .common import CheckContext, set_current
 
 HOOKS_WITH_DEPS = ("use_effect", "use_callback", "use_memo")
 
 
-class ExhaustiveDepsVisitor(ErrorVisitor):
-    def __init__(self) -> None:
-        super().__init__()
-        self._current_function: Optional[ast.FunctionDef] = None
+class ExhaustiveDepsVisitor(ast.NodeVisitor):
+    def __init__(self, context: CheckContext) -> None:
+        self._context = context
         self._current_hook_or_component: Optional[ast.FunctionDef] = None
 
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
-        if is_hook_def(node) or is_component_def(node):
+        if self._context.is_hook_def(node) or self._context.is_component_def(node):
             with set_current(self, hook_or_component=node):
                 self.generic_visit(node)
         elif self._current_hook_or_component is not None:
@@ -53,10 +52,10 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
         elif isinstance(called_func, ast.Attribute):
             called_func_name = called_func.attr
         else:  # pragma: no cover
-            return None
+            return
 
         if called_func_name not in HOOKS_WITH_DEPS:
-            return None
+            return
 
         func: Optional[ast.expr] = None
         args: Optional[ast.expr] = None
@@ -101,6 +100,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
         variables_defined_in_scope = top_level_variable_finder.variable_names
 
         missing_name_finder = _MissingNameFinder(
+            self._context,
             hook_name=hook_name,
             func_name=func_name,
             dep_names=dep_names,
@@ -112,8 +112,6 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
                 missing_name_finder.visit(b)
         else:
             missing_name_finder.visit(func.body)
-
-        self.errors.extend(missing_name_finder.errors)
 
     def _get_dependency_names_from_expression(
         self, hook_name: str, dependency_expr: Optional[ast.expr]
@@ -129,7 +127,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
                     # ideally we could deal with some common use cases, but since React's
                     # own linter doesn't do this we'll just take the easy route for now:
                     # https://github.com/facebook/react/issues/16265
-                    self._save_error(
+                    self._context.add_error(
                         200,
                         elt,
                         (
@@ -143,7 +141,7 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
             isinstance(dependency_expr, (ast.Constant, ast.NameConstant))
             and dependency_expr.value is None
         ):
-            self._save_error(
+            self._context.add_error(
                 201,
                 dependency_expr,
                 (
@@ -156,16 +154,17 @@ class ExhaustiveDepsVisitor(ErrorVisitor):
             return set()
 
 
-class _MissingNameFinder(ErrorVisitor):
+class _MissingNameFinder(ast.NodeVisitor):
     def __init__(
         self,
+        context: CheckContext,
         hook_name: str,
         func_name: str,
         dep_names: Set[str],
         ignore_names: Set[str],
         names_in_scope: Set[str],
     ) -> None:
-        super().__init__()
+        self._context = context
         self._hook_name = hook_name
         self._func_name = func_name
         self._ignore_names = ignore_names
@@ -179,7 +178,7 @@ class _MissingNameFinder(ErrorVisitor):
             if node_id in self._dep_names:
                 self.used_deps.add(node_id)
             else:
-                self._save_error(
+                self._context.add_error(
                     202,
                     node,
                     (

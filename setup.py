@@ -18,7 +18,7 @@ root = os.path.join(here, name)
 package = {
     "name": name,
     "packages": setuptools.find_packages(exclude=["tests*"]),
-    "entry_points": {"flake8.extension": ["ROH=flake8_idom_hooks:Plugin"]},
+    "entry_points": {"flake8.extension": ["ROH=flake8_idom_hooks:plugin"]},
     "python_requires": ">=3.6",
     "description": "Flake8 plugin to enforce the rules of hooks for IDOM",
     "author": "Ryan Morshead",

@@ -25,9 +25,6 @@ tox
 
 # Errors
 
-`ROH2**` errors can be enabled with the `--exhaustive-hook-deps` flag or setting
-`exhaustive_hook_deps = True` in your  `flake8` config.
-
 <table>
     <tr>
         <th>Code</th>
@@ -60,6 +57,44 @@ tox
         <td>ROH202</td>
         <td>
             Hook dependency is not specified
+        </td>
+    </tr>
+</table>
+
+# Options
+
+All options my be used as CLI flags where `_` characters are replaced with `-`. For
+example, `exhaustive_hook_deps` would become `--exhaustive-hook-deps`.
+
+<table>
+    <tr>
+        <th>Option</th>
+        <th>Type</th>
+        <th>Default</th>
+        <th>Description</th>
+    </tr>
+    <tr>
+        <td><code>exhaustive_hook_deps</code></td>
+        <td>Boolean</td>
+        <td><code>False</code></td>
+        <td>Enable <code>ROH2**</code> errors (recommended)</td>
+    </tr>
+    <tr>
+        <td><code>component_decorator_pattern</code></td>
+        <td>Regex</td>
+        <td><code>^(component|[\w\.]+\.component)$</code></td>
+        <td>
+            The pattern which should match the component decorators. Useful if
+            you import the <code>@component</code> decorator under an alias.
+        </td>
+    </tr>
+    <tr>
+        <td><code>hook_function_pattern</code></td>
+        <td>Regex</td>
+        <td><code>^_*use_\w+$</code></td>
+        <td>
+            The pattern which should match the name of hook functions. Best used if you
+            have existing functions with <code>use_*</code> names that are not hooks.
         </td>
     </tr>
 </table>
