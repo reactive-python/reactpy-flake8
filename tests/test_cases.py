@@ -1,4 +1,5 @@
 import ast
+import sys
 from pathlib import Path
 
 import pytest
@@ -33,12 +34,20 @@ def setup_plugin(args):
             "hook_usage.py",
         ),
         (
-            "--exhaustive-hook-deps",
-            "exhaustive_deps.py",
-        ),
-        (
             "",
             "no_exhaustive_deps.py",
+        ),
+        pytest.param(
+            "",
+            "match_statement.py",
+            marks=pytest.mark.skipif(
+                sys.version_info < (3, 10),
+                reason="Match statement only in Python 3.10 and above",
+            ),
+        ),
+        (
+            "--exhaustive-hook-deps",
+            "exhaustive_deps.py",
         ),
         (
             r"--component-decorator-pattern ^(component|custom_component)$",

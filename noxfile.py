@@ -46,7 +46,18 @@ def test_suite(session: Session) -> None:
 def test_coverage(session: Session) -> None:
     install_requirements(session, "test-env")
     session.install("-e", ".")
-    session.run("pytest", "tests", "--cov=flake8_idom_hooks", "--cov-report=term")
+
+    posargs = session.posargs[:]
+
+    if "--no-cov" in session.posargs:
+        posargs.remove("--no-cov")
+        session.log("Coverage won't be checked")
+        session.install(".")
+    else:
+        posargs += ["--cov=flake8_idom_hooks", "--cov-report=term"]
+        session.install("-e", ".")
+
+    session.run("pytest", "tests", *posargs)
 
 
 def install_requirements(session: Session, name: str) -> None:

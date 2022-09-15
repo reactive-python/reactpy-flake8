@@ -43,6 +43,10 @@ tox
         <td>Hook was used inside a conditional or loop statement</td>
     </tr>
     <tr>
+        <td>ROH103</td>
+        <td>Hook was used after an early return</td>
+    </tr>
+    <tr>
         <td>ROH200</td>
         <td>
             A hook's dependency is not destructured - dependencies should be refered to

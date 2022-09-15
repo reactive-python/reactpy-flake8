@@ -159,3 +159,11 @@ if True:
     @component
     def use_other():
         use_state
+
+
+@component
+def example():
+    if True:
+        return None
+    # error: ROH103 hook 'use_state' used after an early return
+    use_state()
