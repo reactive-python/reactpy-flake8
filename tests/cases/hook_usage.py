@@ -3,10 +3,28 @@ from idom import component
 
 
 @component
+def HookInIfNoCall():
+    if True:
+        # Ok, hook was not called
+        use_state
+
+
+@component
 def HookInIf():
     if True:
         # error: ROH102 hook 'use_state' used inside if statement
-        use_state
+        use_state()
+
+
+@component
+def HookInIfInExpression():
+    if True:
+        (
+            None
+            or
+            # error: ROH102 hook 'use_state' used inside if statement
+            use_state
+        )()
 
 
 @component
@@ -15,7 +33,7 @@ def HookInElif():
         pass
     elif True:
         # error: ROH102 hook 'use_state' used inside if statement
-        use_state
+        use_state()
 
 
 @component
@@ -24,14 +42,14 @@ def HookInElse():
         pass
     else:
         # error: ROH102 hook 'use_state' used inside if statement
-        use_state
+        use_state()
 
 
 @component
 def HookInIfExp():
     (
         # error: ROH102 hook 'use_state' used inside inline if expression
-        use_state
+        use_state()
         if True
         else None
     )
@@ -44,7 +62,7 @@ def HookInElseOfIfExp():
         if True
         else
         # error: ROH102 hook 'use_state' used inside inline if expression
-        use_state
+        use_state()
     )
 
 
@@ -52,7 +70,7 @@ def HookInElseOfIfExp():
 def HookInTry():
     try:
         # error: ROH102 hook 'use_state' used inside try statement
-        use_state
+        use_state()
     except:
         pass
 
@@ -63,7 +81,7 @@ def HookInExcept():
         raise ValueError()
     except:
         # error: ROH102 hook 'use_state' used inside try statement
-        use_state
+        use_state()
 
 
 @component
@@ -72,21 +90,21 @@ def HookInFinally():
         pass
     finally:
         # error: ROH102 hook 'use_state' used inside try statement
-        use_state
+        use_state()
 
 
 @component
 def HookInForLoop():
     for i in range(3):
         # error: ROH102 hook 'use_state' used inside for loop
-        use_state
+        use_state()
 
 
 @component
 def HookInWhileLoop():
     while True:
         # error: ROH102 hook 'use_state' used inside while loop
-        use_state
+        use_state()
 
 
 def outer_function():
@@ -97,31 +115,34 @@ def outer_function():
 
 def generic_function():
     # error: ROH101 hook 'use_state' used outside component or hook definition
-    use_state
+    use_state()
 
 
 @component
 def use_state():
-    use_other
+    use_other()
 
 
 @component
 def Component():
-    use_state
+    use_state()
 
 
 @idom.component
 def IdomLongImportComponent():
-    use_state
+    use_state()
 
 
 @component
 def use_custom_hook():
-    use_state
+    use_state()
 
 
 # ok since 'use_state' is not the last attribute
 module.use_state.other
+
+# ok since use state is not called
+module.use_effect
 
 # error: ROH101 hook 'use_effect' used outside component or hook definition
 module.use_effect()
@@ -129,7 +150,7 @@ module.use_effect()
 
 def not_hook_or_component():
     # error: ROH101 hook 'use_state' used outside component or hook definition
-    use_state
+    use_state()
 
 
 @component
@@ -137,7 +158,7 @@ def make_component():
     # nested component definitions are ok.
     @component
     def NestedComponent():
-        use_state
+        use_state()
 
 
 some_global_variable
@@ -154,11 +175,11 @@ if True:
     @component
     def Component():
         # this is ok since the conditional is outside the component
-        use_state
+        use_state()
 
     @component
     def use_other():
-        use_state
+        use_state()
 
 
 @component

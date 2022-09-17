@@ -1,7 +1,7 @@
 # confirm that we're still checking for other errors
 def generic_function():
     # error: ROH101 hook 'use_state' used outside component or hook definition
-    use_state
+    use_state()
 
 
 @component
