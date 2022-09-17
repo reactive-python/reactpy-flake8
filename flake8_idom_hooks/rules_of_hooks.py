@@ -45,8 +45,13 @@ class RulesOfHooksVisitor(ast.NodeVisitor):
             with set_current(self, function=node):
                 self.generic_visit(node)
 
+    def visit_Call(self, node: ast.Call) -> None:
+        with set_current(self, call=node):
+            self.generic_visit(node)
+
     def _visit_hook_usage(self, node: ast.Name | ast.Attribute) -> None:
-        self._check_if_propper_hook_usage(node)
+        if self._current_call:
+            self._check_if_propper_hook_usage(node)
 
     visit_Attribute = _visit_hook_usage
     visit_Name = _visit_hook_usage
