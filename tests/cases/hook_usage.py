@@ -7,6 +7,8 @@ def HookInIfNoCall():
     if True:
         # Ok, hook was not called
         use_state
+        # Also ok, hook itself was not called
+        func(use_state)
 
 
 @component
