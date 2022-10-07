@@ -188,7 +188,7 @@ if True:
 def example():
     if True:
         return None
-    # error: ROH103 hook 'use_state' used after an early return
+    # error: ROH103 hook 'use_state' used after an early return on line 190
     use_state()
 
 
@@ -211,3 +211,11 @@ def example():
 
     # Ok: no early return error
     use_state()
+
+
+@idom.component
+def regression_check():
+    @use_effect
+    def effect():
+        # this return caused false passitive early return error in use_effect usage
+        return cleanup

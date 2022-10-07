@@ -81,7 +81,8 @@ class RulesOfHooksVisitor(ast.NodeVisitor):
     visit_While = _visit_loop
 
     def visit_Return(self, node: ast.Return) -> None:
-        self._current_early_return = node
+        if self._current_component is self._current_function:
+            self._current_early_return = node
 
     def _check_if_hook_defined_in_function(self, node: ast.FunctionDef) -> None:
         if self._current_function is not None:
@@ -111,7 +112,7 @@ class RulesOfHooksVisitor(ast.NodeVisitor):
             self._context.add_error(
                 103,
                 node,
-                f"hook {name!r} used after an early return",
+                f"hook {name!r} used after an early return on line {self._current_early_return.lineno}",
             )
 
 
