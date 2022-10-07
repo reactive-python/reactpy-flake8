@@ -190,3 +190,24 @@ def example():
         return None
     # error: ROH103 hook 'use_state' used after an early return
     use_state()
+
+
+@component
+def example():
+    def closure():
+        # this return is ok since it's not in the same function
+        return None
+
+    # Ok: no early return error
+    use_state()
+
+
+@component
+def example():
+    @use_effect
+    def some_effect():
+        # this return is ok since it's not in the same function
+        return None
+
+    # Ok: no early return error
+    use_state()

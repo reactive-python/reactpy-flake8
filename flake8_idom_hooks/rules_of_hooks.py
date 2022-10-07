@@ -42,7 +42,11 @@ class RulesOfHooksVisitor(ast.NodeVisitor):
             ):
                 self.generic_visit(node)
         else:
-            with set_current(self, function=node):
+            with set_current(
+                self,
+                function=node,
+                early_return=None,
+            ):
                 self.generic_visit(node)
 
     def visit_Call(self, node: ast.Call) -> None:
