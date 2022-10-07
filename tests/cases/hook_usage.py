@@ -219,3 +219,8 @@ def regression_check():
     def effect():
         # this return caused false passitive early return error in use_effect usage
         return cleanup
+
+    @use_effect
+    async def effect():
+        # this return caused false passitive early return error in use_effect usage
+        return cleanup

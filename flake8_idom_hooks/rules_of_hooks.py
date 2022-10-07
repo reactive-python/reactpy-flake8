@@ -49,6 +49,14 @@ class RulesOfHooksVisitor(ast.NodeVisitor):
             ):
                 self.generic_visit(node)
 
+    def visit_AsyncFunctionDef(self, node: ast.AsyncFunctionDef) -> None:
+        with set_current(
+            self,
+            function=node,
+            early_return=None,
+        ):
+            self.generic_visit(node)
+
     def visit_Call(self, node: ast.Call) -> None:
         with set_current(self, call=node):
             self.visit(node.func)
