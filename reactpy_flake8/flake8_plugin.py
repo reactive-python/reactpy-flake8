@@ -16,7 +16,6 @@ from .exhaustive_deps import HOOKS_WITH_DEPS
 
 
 class Plugin:
-
     name = __name__
     version = __version__
 

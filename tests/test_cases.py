@@ -2,6 +2,7 @@ import ast
 import sys
 from pathlib import Path
 
+import flake8
 import pytest
 from flake8.options.manager import OptionManager
 
@@ -12,15 +13,42 @@ HERE = Path(__file__).parent
 
 
 def setup_plugin(args):
-    options_manager = OptionManager(
-        version="0.0.0",
-        plugin_versions=reactpy_flake8.__version__,
-        parents=[],
-    )
+    if flake8.__version_info__ >= (6,):
+        options_manager = OptionManager(
+            version="",
+            plugin_versions="",
+            parents=[],
+            formatter_names=[],
+        )
+    elif flake8.__version_info__ >= (5,):
+        options_manager = OptionManager(
+            version="",
+            plugin_versions="",
+            parents=[],
+        )
+    elif flake8.__version_info__ >= (4,):
+        options_manager = OptionManager(
+            version="",
+            parents=[],
+            prog="",
+        )
+    elif flake8.__version_info__ >= (3, 7):
+        options_manager = OptionManager(
+            version="",
+            parents=[],
+            prog="",
+        )
+    else:
+        raise RuntimeError("Unsupported flake8 version")
 
     plugin = Plugin()
     plugin.add_options(options_manager)
-    options = options_manager.parse_args(args)
+
+    if flake8.__version_info__ >= (5,):
+        options = options_manager.parse_args(args)
+    else:
+        options, _ = options_manager.parse_args(args)
+
     plugin.parse_options(options)
 
     return plugin
