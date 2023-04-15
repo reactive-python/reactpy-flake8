@@ -18,7 +18,7 @@ root = os.path.join(here, name)
 package = {
     "name": name,
     "packages": setuptools.find_packages(exclude=["tests*"]),
-    "entry_points": {"flake8.extension": ["ROH=reactpy_flake8:plugin"]},
+    "entry_points": {"flake8.extension": ["REACTPY=reactpy_flake8:plugin"]},
     "python_requires": ">=3.6",
     "description": "Flake8 plugin to enforce the rules of hooks for ReactPy",
     "author": "Ryan Morshead",

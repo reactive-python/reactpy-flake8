@@ -14,7 +14,7 @@ def HookInIfNoCall():
 @component
 def HookInIf():
     if True:
-        # error: ROH102 hook 'use_state' used inside if statement
+        # error: REACTPY102 hook 'use_state' used inside if statement
         use_state()
 
 
@@ -24,7 +24,7 @@ def HookInIfInExpression():
         (
             None
             or
-            # error: ROH102 hook 'use_state' used inside if statement
+            # error: REACTPY102 hook 'use_state' used inside if statement
             use_state
         )()
 
@@ -34,7 +34,7 @@ def HookInElif():
     if False:
         pass
     elif True:
-        # error: ROH102 hook 'use_state' used inside if statement
+        # error: REACTPY102 hook 'use_state' used inside if statement
         use_state()
 
 
@@ -43,14 +43,14 @@ def HookInElse():
     if False:
         pass
     else:
-        # error: ROH102 hook 'use_state' used inside if statement
+        # error: REACTPY102 hook 'use_state' used inside if statement
         use_state()
 
 
 @component
 def HookInIfExp():
     (
-        # error: ROH102 hook 'use_state' used inside inline if expression
+        # error: REACTPY102 hook 'use_state' used inside inline if expression
         use_state()
         if True
         else None
@@ -63,7 +63,7 @@ def HookInElseOfIfExp():
         None
         if True
         else
-        # error: ROH102 hook 'use_state' used inside inline if expression
+        # error: REACTPY102 hook 'use_state' used inside inline if expression
         use_state()
     )
 
@@ -71,7 +71,7 @@ def HookInElseOfIfExp():
 @component
 def HookInTry():
     try:
-        # error: ROH102 hook 'use_state' used inside try statement
+        # error: REACTPY102 hook 'use_state' used inside try statement
         use_state()
     except:
         pass
@@ -82,7 +82,7 @@ def HookInExcept():
     try:
         raise ValueError()
     except:
-        # error: ROH102 hook 'use_state' used inside try statement
+        # error: REACTPY102 hook 'use_state' used inside try statement
         use_state()
 
 
@@ -91,32 +91,32 @@ def HookInFinally():
     try:
         pass
     finally:
-        # error: ROH102 hook 'use_state' used inside try statement
+        # error: REACTPY102 hook 'use_state' used inside try statement
         use_state()
 
 
 @component
 def HookInForLoop():
     for i in range(3):
-        # error: ROH102 hook 'use_state' used inside for loop
+        # error: REACTPY102 hook 'use_state' used inside for loop
         use_state()
 
 
 @component
 def HookInWhileLoop():
     while True:
-        # error: ROH102 hook 'use_state' used inside while loop
+        # error: REACTPY102 hook 'use_state' used inside while loop
         use_state()
 
 
 def outer_function():
-    # error: ROH100 hook 'use_state' defined as closure in function 'outer_function'
+    # error: REACTPY100 hook 'use_state' defined as closure in function 'outer_function'
     def use_state():
         ...
 
 
 def generic_function():
-    # error: ROH101 hook 'use_state' used outside component or hook definition
+    # error: REACTPY101 hook 'use_state' used outside component or hook definition
     use_state()
 
 
@@ -146,12 +146,12 @@ module.use_state.other
 # ok since use state is not called
 module.use_effect
 
-# error: ROH101 hook 'use_effect' used outside component or hook definition
+# error: REACTPY101 hook 'use_effect' used outside component or hook definition
 module.use_effect()
 
 
 def not_hook_or_component():
-    # error: ROH101 hook 'use_state' used outside component or hook definition
+    # error: REACTPY101 hook 'use_state' used outside component or hook definition
     use_state()
 
 
@@ -188,7 +188,7 @@ if True:
 def example():
     if True:
         return None
-    # error: ROH103 hook 'use_state' used after an early return on line 190
+    # error: REACTPY103 hook 'use_state' used after an early return on line 190
     use_state()
 
 
