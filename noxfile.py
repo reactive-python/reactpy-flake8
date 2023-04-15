@@ -32,7 +32,7 @@ def test_style(session: Session) -> None:
 @session
 def test_types(session: Session) -> None:
     install_requirements(session, "types")
-    session.run("mypy", "--strict", "flake8_idom_hooks")
+    session.run("mypy", "--strict", "reactpy_flake8")
 
 
 @session
@@ -54,7 +54,7 @@ def test_coverage(session: Session) -> None:
         session.log("Coverage won't be checked")
         session.install(".")
     else:
-        posargs += ["--cov=flake8_idom_hooks", "--cov-report=term"]
+        posargs += ["--cov=reactpy_flake8", "--cov-report=term"]
         session.install("-e", ".")
 
     session.run("pytest", "tests", *posargs)

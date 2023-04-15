@@ -1,5 +1,5 @@
-import idom
-from idom import component
+import reactpy
+from reactpy import component
 
 
 @component
@@ -130,7 +130,7 @@ def Component():
     use_state()
 
 
-@idom.component
+@reactpy.component
 def IdomLongImportComponent():
     use_state()
 
@@ -213,7 +213,7 @@ def example():
     use_state()
 
 
-@idom.component
+@reactpy.component
 def regression_check():
     @use_effect
     def effect():

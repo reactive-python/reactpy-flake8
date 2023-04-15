@@ -1,13 +1,13 @@
-# `flake8-idom-hooks`
+# `reactpy-flake8`
 
-A Flake8 plugin that enforces the ["rules of hooks"](https://reactjs.org/docs/hooks-rules.html) for [IDOM](https://github.com/idom-team/idom).
+A Flake8 plugin that enforces the ["rules of hooks"](https://reactjs.org/docs/hooks-rules.html) for [ReactPy](https://github.com/reactive-python/reactpy).
 
 The implementation is based on React's own ESLint [plugin for hooks](https://github.com/facebook/react/tree/master/packages/eslint-plugin-react-hooks).
 
 # Install
 
 ```bash
-pip install flake8-idom-hooks
+pip install reactpy-flake8
 ```
 
 # Developer Installation

@@ -5,8 +5,8 @@ from pathlib import Path
 import pytest
 from flake8.options.manager import OptionManager
 
-import flake8_idom_hooks
-from flake8_idom_hooks.flake8_plugin import Plugin
+import reactpy_flake8
+from reactpy_flake8.flake8_plugin import Plugin
 
 HERE = Path(__file__).parent
 
@@ -14,7 +14,7 @@ HERE = Path(__file__).parent
 def setup_plugin(args):
     options_manager = OptionManager(
         version="0.0.0",
-        plugin_versions=flake8_idom_hooks.__version__,
+        plugin_versions=reactpy_flake8.__version__,
         parents=[],
     )
 
@@ -59,7 +59,7 @@ def setup_plugin(args):
         ),
     ],
 )
-def test_flake8_idom_hooks(options_args, case_file_name):
+def test_reactpy_flake8(options_args, case_file_name):
     case_file = Path(__file__).parent / "cases" / case_file_name
     # save the file's AST
     file_content = case_file.read_text()
@@ -72,7 +72,7 @@ def test_flake8_idom_hooks(options_args, case_file_name):
             lineno = index + 2  # use 2 since error should be on next line
             col_offset = len(line) - len(lstrip_line)
             message = line.replace("# error:", "", 1).strip()
-            expected_errors.add((lineno, col_offset, message, flake8_idom_hooks.Plugin))
+            expected_errors.add((lineno, col_offset, message, reactpy_flake8.Plugin))
 
     plugin = setup_plugin(options_args.split())
     actual_errors = plugin(ast.parse(file_content, case_file_name))

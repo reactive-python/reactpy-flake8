@@ -5,8 +5,8 @@ from argparse import Namespace
 
 from flake8.options.manager import OptionManager
 
-from flake8_idom_hooks import __version__
-from flake8_idom_hooks.run import (
+from reactpy_flake8 import __version__
+from reactpy_flake8.run import (
     DEFAULT_COMPONENT_DECORATOR_PATTERN,
     DEFAULT_HOOK_FUNCTION_PATTERN,
     run_checks,
