@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from nox import Session, session
+from nox import Session, parametrize, session
 
 ROOT = Path(".")
 REQUIREMENTS_DIR = ROOT / "requirements"
@@ -36,8 +36,10 @@ def test_types(session: Session) -> None:
 
 
 @session
-def test_suite(session: Session) -> None:
+@parametrize("flake8_version", ["3", "4", "5", "6"])
+def test_suite(session: Session, flake8_version: str) -> None:
     install_requirements(session, "test-env")
+    session.install(f"flake8=={flake8_version}.*")
     session.install(".")
     session.run("pytest", "tests")
 
