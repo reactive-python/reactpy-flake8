@@ -27,7 +27,9 @@ class CheckContext:
         self._component_decorator_pattern = re.compile(component_decorator_pattern)
 
     def add_error(self, error_code: int, node: ast.AST, message: str) -> None:
-        self.errors.append((node.lineno, node.col_offset, f"ROH{error_code} {message}"))
+        self.errors.append(
+            (node.lineno, node.col_offset, f"REACTPY{error_code} {message}")
+        )
 
     def is_hook_def(self, node: ast.FunctionDef) -> bool:
         return self.is_hook_name(node.name)

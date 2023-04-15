@@ -20,7 +20,7 @@ pip install -e .
 Run the tests
 
 ```bash
-tox
+nox -s test
 ```
 
 # Errors
@@ -31,34 +31,34 @@ tox
         <th>Message</th>
     </tr>
     <tr>
-        <td>ROH100</td>
+        <td>REACTPY100</td>
         <td>Hook is defined as a closure</td>
     </tr>
     <tr>
-        <td>ROH101</td>
+        <td>REACTPY101</td>
         <td>Hook was used outside component or hook definition</td>
     </tr>
     <tr>
-        <td>ROH102</td>
+        <td>REACTPY102</td>
         <td>Hook was used inside a conditional or loop statement</td>
     </tr>
     <tr>
-        <td>ROH103</td>
+        <td>REACTPY103</td>
         <td>Hook was used after an early return</td>
     </tr>
     <tr>
-        <td>ROH200</td>
+        <td>REACTPY200</td>
         <td>
             A hook's dependency is not destructured - dependencies should be refered to
             directly, not via an attribute or key of an object
         </td>
     </tr>
     <tr>
-        <td>ROH201</td>
+        <td>REACTPY201</td>
         <td>Hook dependency args should be a literal list, tuple or None</td>
     </tr>
     <tr>
-        <td>ROH202</td>
+        <td>REACTPY202</td>
         <td>
             Hook dependency is not specified
         </td>
@@ -81,7 +81,7 @@ example, `exhaustive_hook_deps` would become `--exhaustive-hook-deps`.
         <td><code>exhaustive_hook_deps</code></td>
         <td>Boolean</td>
         <td><code>False</code></td>
-        <td>Enable <code>ROH2**</code> errors (recommended)</td>
+        <td>Enable <code>REACTPY2**</code> errors (recommended)</td>
     </tr>
     <tr>
         <td><code>component_decorator_pattern</code></td>
